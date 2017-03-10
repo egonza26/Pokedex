@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 
-class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
+class PokemonMainVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
 
     
     @IBOutlet weak var collection: UICollectionView!
@@ -43,7 +43,8 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        let poke = inSearchMode ? filterPokemon[indexPath.row] : pokemon[indexPath.row]
+        performSegue(withIdentifier: "PokemonMainToPokemonDetail", sender: poke)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -88,7 +89,6 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         do {
             let csv = try CSV(contentsOfURL: path)
             let rows = csv.rows
-            
             for row in rows {
                 let pokeId = Int(row["id"]!)!
                 let name = row["identifier"]!
@@ -112,6 +112,16 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         } else {
             musicPlayer.play()
             sender.alpha = 1.0
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "PokemonMainToPokemonDetail" {
+            if let detailsVC = segue.destination as? PokemonDetailVC {
+                if let pokemon = sender as? Pokemon {
+                    detailsVC.pokemon = pokemon
+                }
+            }
         }
     }
     
